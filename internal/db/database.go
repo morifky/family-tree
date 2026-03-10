@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"brayat/internal/model"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -50,7 +52,10 @@ func MustOpen(dbPath string) *gorm.DB {
 
 	// AutoMigrate all models here (will be populated in MOR-12)
 	err = database.AutoMigrate(
-	// e.g. &model.Session{}, &model.AccessLink{}, &model.Person{}, &model.Relationship{}
+		&model.Session{},
+		&model.AccessLink{},
+		&model.Person{},
+		&model.Relationship{},
 	)
 	if err != nil {
 		panic(fmt.Errorf("failed to run migrations: %w", err))
