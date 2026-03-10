@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+
+# Go
+tmp/
+bin/
+vendor/
+*.out
+
+# Node / Svelte
+node_modules/
+.svelte-kit/
+build/
+dist/
+.env
+.env.*
+.env.local
+
+# Database / SQLite
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# Editor
+.vscode/
+.idea/
+*.swp
