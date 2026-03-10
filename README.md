@@ -13,7 +13,7 @@ Targeted toward Indonesian families, the minimal app provides a privacy-first, s
 
 ## Technology Stack
 
-- **Backend & API**: Go 1.23+, `gin-gonic`, `gorm`, and `sqlite`
+- **Backend & API**: Go 1.26+, `gin-gonic`, `gorm`, and `sqlite`
 - **Frontend App**: SvelteKit (`adapter-static`), Svelte 5 Runes, and Vanilla CSS
 - **Deployment**: Single process Go server acting as both the API and Static Asset host, deployed smoothly onto Fly.io
 
