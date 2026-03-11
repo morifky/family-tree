@@ -99,6 +99,9 @@ func TestRelationshipRepository_DeleteRelationship(t *testing.T) {
 	var count int64
 	db.Model(&model.Relationship{}).Where("id = ?", "del1").Count(&count)
 	assert.Equal(t, int64(0), count)
+
+	err = repo.DeleteRelationship(ctx, "nonexistent")
+	assert.NoError(t, err) // Should return nil if not found
 }
 
 func TestRelationshipRepository_DeleteRelationshipsByPersonID(t *testing.T) {

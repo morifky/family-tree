@@ -91,6 +91,16 @@ func TestSessionService_CreateSession(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, s)
 	})
+
+	t.Run("DB Error", func(t *testing.T) {
+		mockRepo.On("CreateSession", ctx, mock.AnythingOfType("*model.Session")).Return(errors.New("db error")).Once()
+		
+		s, err := svc.CreateSession(ctx, "Family Tree")
+		assert.Error(t, err)
+		assert.Nil(t, s)
+		
+		mockRepo.AssertExpectations(t)
+	})
 }
 
 func TestSessionService_GetSession(t *testing.T) {
@@ -158,6 +168,16 @@ func TestSessionService_CreateAccessLink(t *testing.T) {
 		l, err := svc.CreateAccessLink(ctx, "sess1", "wrong_type")
 		assert.Error(t, err)
 		assert.Nil(t, l)
+	})
+
+	t.Run("DB Error", func(t *testing.T) {
+		mockRepo.On("CreateAccessLink", ctx, mock.AnythingOfType("*model.AccessLink")).Return(errors.New("db error")).Once()
+		
+		l, err := svc.CreateAccessLink(ctx, "sess1", model.AccessTypeEdit)
+		assert.Error(t, err)
+		assert.Nil(t, l)
+		
+		mockRepo.AssertExpectations(t)
 	})
 }
 
