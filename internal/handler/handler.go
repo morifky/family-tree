@@ -15,7 +15,7 @@ type Handlers struct {
 }
 
 // NewHandlers links all the handlers to their underlying services.
-func NewHandlers(services *service.Services, photoStorage *storage.PhotoStorage) *Handlers {
+func NewHandlers(services *service.Services, photoStorage storage.PhotoStorage) *Handlers {
 	return &Handlers{
 		Session: NewSessionHandler(services.Session),
 		Person:  NewPersonHandler(services.Person, photoStorage),

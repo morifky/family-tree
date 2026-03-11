@@ -9,11 +9,11 @@ import (
 
 type personService struct {
 	repo         model.PersonRepository
-	photoStorage *storage.PhotoStorage
+	photoStorage storage.PhotoStorage
 }
 
 // NewPersonService initializes a new PersonService with its dependencies.
-func NewPersonService(repo model.PersonRepository, photoStorage *storage.PhotoStorage) model.PersonService {
+func NewPersonService(repo model.PersonRepository, photoStorage storage.PhotoStorage) model.PersonService {
 	return &personService{
 		repo:         repo,
 		photoStorage: photoStorage,

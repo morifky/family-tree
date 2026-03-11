@@ -10,18 +10,25 @@ import (
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-type PhotoStorage struct {
+// PhotoStorage defines the behavior expected from any photo storage provider
+type PhotoStorage interface {
+	SavePhoto(fileHeader *multipart.FileHeader) (string, error)
+	DeletePhoto(filename string) error
+}
+
+type localPhotoStorage struct {
 	baseDir string
 }
 
-func NewPhotoStorage(baseDir string) *PhotoStorage {
+// NewLocalPhotoStorage initializes a new local disk-based photo storage
+func NewLocalPhotoStorage(baseDir string) PhotoStorage {
 	_ = os.MkdirAll(baseDir, os.ModePerm)
-	return &PhotoStorage{baseDir: baseDir}
+	return &localPhotoStorage{baseDir: baseDir}
 }
 
 // SavePhoto takes a multipart file header and saves it to the disk.
 // Returns the file path or an error.
-func (s *PhotoStorage) SavePhoto(fileHeader *multipart.FileHeader) (string, error) {
+func (s *localPhotoStorage) SavePhoto(fileHeader *multipart.FileHeader) (string, error) {
 	if fileHeader == nil {
 		return "", fmt.Errorf("file is nil")
 	}
@@ -59,7 +66,7 @@ func (s *PhotoStorage) SavePhoto(fileHeader *multipart.FileHeader) (string, erro
 	return filename, nil
 }
 
-func (s *PhotoStorage) DeletePhoto(filename string) error {
+func (s *localPhotoStorage) DeletePhoto(filename string) error {
 	if filename == "" {
 		return nil
 	}
