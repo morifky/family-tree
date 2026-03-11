@@ -12,11 +12,11 @@ import (
 // PersonHandler handles HTTP requests for Person resources
 type PersonHandler struct {
 	service      model.PersonService
-	photoStorage *storage.PhotoStorage
+	photoStorage storage.PhotoStorage
 }
 
 // NewPersonHandler creates a new handler serving person requests
-func NewPersonHandler(svc model.PersonService, photoStorage *storage.PhotoStorage) *PersonHandler {
+func NewPersonHandler(svc model.PersonService, photoStorage storage.PhotoStorage) *PersonHandler {
 	return &PersonHandler{service: svc, photoStorage: photoStorage}
 }
 
