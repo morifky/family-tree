@@ -9,16 +9,17 @@ import (
 
 // Handlers bundles all route handlers.
 type Handlers struct {
-	Session *SessionHandler
-	Person  *PersonHandler
-	// Add Relationship handlers here down the line
+	Session      *SessionHandler
+	Person       *PersonHandler
+	Relationship *RelationshipHandler
 }
 
 // NewHandlers links all the handlers to their underlying services.
 func NewHandlers(services *service.Services, photoStorage storage.PhotoStorage) *Handlers {
 	return &Handlers{
-		Session: NewSessionHandler(services.Session),
-		Person:  NewPersonHandler(services.Person, photoStorage),
+		Session:      NewSessionHandler(services.Session),
+		Person:       NewPersonHandler(services.Person, photoStorage),
+		Relationship: NewRelationshipHandler(services.Relationship),
 	}
 }
 
@@ -38,6 +39,10 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 			// Nested People under Session
 			sessions.POST("/:id/people", h.Person.CreatePerson)
 			sessions.GET("/:id/people", h.Person.GetPeople)
+
+			// Nested Relationships under Session
+			sessions.POST("/:id/relationships", h.Relationship.CreateRelationship)
+			sessions.GET("/:id/relationships", h.Relationship.GetRelationships)
 		}
 
 		// People
@@ -45,6 +50,12 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 		{
 			people.PUT("/:id", h.Person.UpdatePerson)
 			people.DELETE("/:id", h.Person.DeletePerson)
+		}
+
+		// Relationships
+		relationships := api.Group("/relationships")
+		{
+			relationships.DELETE("/:id", h.Relationship.DeleteRelationship)
 		}
 	}
 }
