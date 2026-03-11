@@ -21,8 +21,9 @@ const (
 type AccessType string
 
 const (
-	AccessTypeEdit AccessType = "edit"
-	AccessTypeView AccessType = "view"
+	AccessTypeAdmin AccessType = "admin"
+	AccessTypeEdit  AccessType = "edit"
+	AccessTypeView  AccessType = "view"
 )
 
 // Session represents a family tree session

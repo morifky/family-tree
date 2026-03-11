@@ -93,9 +93,8 @@ func (s *sessionService) VerifyAccessCode(ctx context.Context, code string) (str
 	// First check if it's an admin code directly from the session
 	session, err := s.repo.GetSessionByAdminCode(ctx, code)
 	if err == nil {
-		// Valid tracking code as an admin (which resolves to edit capability per se or better!)
-		// We'll map Admin code down as edit internally for access layers though.
-		return session.ID, model.AccessTypeEdit, nil
+		// Valid tracking code as an admin (which resolves to admin capability)
+		return session.ID, model.AccessTypeAdmin, nil
 	}
 
 	// Maybe it's an access link code dynamically generated?
