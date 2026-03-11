@@ -30,9 +30,25 @@ func (r *relationshipRepository) GetRelationshipsBySessionID(ctx context.Context
 }
 
 func (r *relationshipRepository) DeleteRelationship(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&model.Relationship{}).Error
+	var rel model.Relationship
+	if err := r.db.WithContext(ctx).First(&rel, "id = ?", id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil
+		}
+		return err
+	}
+	return r.db.WithContext(ctx).Delete(&rel).Error
 }
 
 func (r *relationshipRepository) DeleteRelationshipsByPersonID(ctx context.Context, personID string) error {
-	return r.db.WithContext(ctx).Where("person_a_id = ? OR person_b_id = ?", personID, personID).Delete(&model.Relationship{}).Error
+	var rels []model.Relationship
+	if err := r.db.WithContext(ctx).Where("person_a_id = ? OR person_b_id = ?", personID, personID).Find(&rels).Error; err != nil {
+		return err
+	}
+	for _, rel := range rels {
+		if err := r.db.WithContext(ctx).Delete(&rel).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }

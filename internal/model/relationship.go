@@ -38,6 +38,16 @@ func (r *Relationship) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+// AfterSave touches the parent Session to update its UpdatedAt field
+func (r *Relationship) AfterSave(tx *gorm.DB) (err error) {
+	return tx.Model(&Session{ID: r.SessionID}).Update("updated_at", time.Now()).Error
+}
+
+// AfterDelete touches the parent Session to update its UpdatedAt field
+func (r *Relationship) AfterDelete(tx *gorm.DB) (err error) {
+	return tx.Model(&Session{ID: r.SessionID}).Update("updated_at", time.Now()).Error
+}
+
 // RelationshipRepository defines the expected behavior of a relationship data access layer
 type RelationshipRepository interface {
 	CreateRelationship(ctx context.Context, rel *Relationship) error

@@ -38,6 +38,16 @@ func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+// AfterSave touches the parent Session to update its UpdatedAt field
+func (p *Person) AfterSave(tx *gorm.DB) (err error) {
+	return tx.Model(&Session{ID: p.SessionID}).Update("updated_at", time.Now()).Error
+}
+
+// AfterDelete touches the parent Session to update its UpdatedAt field
+func (p *Person) AfterDelete(tx *gorm.DB) (err error) {
+	return tx.Model(&Session{ID: p.SessionID}).Update("updated_at", time.Now()).Error
+}
+
 // PersonRepository defines the expected behavior of a person data access layer
 type PersonRepository interface {
 	CreatePerson(ctx context.Context, person *Person) error
