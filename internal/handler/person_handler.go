@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"brayat/internal/model"
 	"brayat/internal/storage"
@@ -13,11 +14,12 @@ import (
 type PersonHandler struct {
 	service      model.PersonService
 	photoStorage storage.PhotoStorage
+	logger       *zap.Logger
 }
 
 // NewPersonHandler creates a new handler serving person requests
-func NewPersonHandler(svc model.PersonService, photoStorage storage.PhotoStorage) *PersonHandler {
-	return &PersonHandler{service: svc, photoStorage: photoStorage}
+func NewPersonHandler(svc model.PersonService, photoStorage storage.PhotoStorage, logger *zap.Logger) *PersonHandler {
+	return &PersonHandler{service: svc, photoStorage: photoStorage, logger: logger}
 }
 
 // POST /sessions/:id/people

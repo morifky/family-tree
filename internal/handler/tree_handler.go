@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"brayat/internal/model"
 )
@@ -16,14 +17,16 @@ type TreeHandler struct {
 	sessionSvc      model.SessionService
 	personSvc       model.PersonService
 	relationshipSvc model.RelationshipService
+	logger          *zap.Logger
 }
 
 // NewTreeHandler creates a new TreeHandler
-func NewTreeHandler(sessionSvc model.SessionService, personSvc model.PersonService, relationshipSvc model.RelationshipService) *TreeHandler {
+func NewTreeHandler(sessionSvc model.SessionService, personSvc model.PersonService, relationshipSvc model.RelationshipService, logger *zap.Logger) *TreeHandler {
 	return &TreeHandler{
 		sessionSvc:      sessionSvc,
 		personSvc:       personSvc,
 		relationshipSvc: relationshipSvc,
+		logger:          logger,
 	}
 }
 

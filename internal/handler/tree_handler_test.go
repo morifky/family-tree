@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 
 	"brayat/internal/handler"
 	"brayat/internal/model"
@@ -26,7 +27,7 @@ func setupTreeRouter(
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-	treeHandler := handler.NewTreeHandler(sessionSvc, personSvc, relSvc)
+	treeHandler := handler.NewTreeHandler(sessionSvc, personSvc, relSvc, zap.NewNop())
 	router.GET("/sessions/:id/tree", treeHandler.GetTree)
 
 	return router

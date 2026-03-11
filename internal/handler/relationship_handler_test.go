@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 
 	"brayat/internal/handler"
 	"brayat/internal/model"
@@ -48,7 +49,7 @@ func setupRelationshipRouter(svc *MockRelationshipService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-	h := handler.NewRelationshipHandler(svc)
+	h := handler.NewRelationshipHandler(svc, zap.NewNop())
 
 	router.POST("/sessions/:id/relationships", h.CreateRelationship)
 	router.GET("/sessions/:id/relationships", h.GetRelationships)

@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 
 	"brayat/internal/handler"
 	"brayat/internal/model"
@@ -75,7 +76,7 @@ func setupPersonRouter(svc *MockPersonService, photo *MockPhotoStorage) *gin.Eng
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 	
-	h := handler.NewPersonHandler(svc, photo)
+	h := handler.NewPersonHandler(svc, photo, zap.NewNop())
 	
 	router.POST("/sessions/:id/people", h.CreatePerson)
 	router.GET("/sessions/:id/people", h.GetPeople)
