@@ -65,10 +65,6 @@ func (s *personService) UpdatePerson(ctx context.Context, id string, name string
 	// If the user wants to remove the photo entirely, they could pass a pointer to an empty string.
 	if photoPath != nil {
 		if *photoPath == "" {
-			// They want to remove the photo. Delete current.
-			if person.PhotoPath != nil && s.photoStorage != nil {
-				_ = s.photoStorage.DeletePhoto(*person.PhotoPath)
-			}
 			person.PhotoPath = nil
 		} else {
 			person.PhotoPath = photoPath
