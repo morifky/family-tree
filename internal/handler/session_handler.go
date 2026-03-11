@@ -106,3 +106,30 @@ func (h *SessionHandler) CreateAccessLink(c *gin.Context) {
 
 	CreatedResponse(c, link)
 }
+
+// GET /sessions/:id/links
+func (h *SessionHandler) GetAccessLinks(c *gin.Context) {
+	id := c.Param("id")
+	links, err := h.service.GetAccessLinksBySessionID(c.Request.Context(), id)
+	if err != nil {
+		ErrorResponse(c, http.StatusInternalServerError, "Failed to get access links")
+		return
+	}
+
+	SuccessResponse(c, links)
+}
+
+// GET /sessions/verify/:code
+func (h *SessionHandler) VerifyCode(c *gin.Context) {
+	code := c.Param("code")
+	sessionID, accessType, err := h.service.VerifyAccessCode(c.Request.Context(), code)
+	if err != nil {
+		ErrorResponse(c, http.StatusUnauthorized, "Invalid or expired code")
+		return
+	}
+
+	SuccessResponse(c, gin.H{
+		"session_id":  sessionID,
+		"access_type": accessType,
+	})
+}

@@ -36,9 +36,11 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 		sessions := api.Group("/sessions")
 		{
 			sessions.POST("", h.Session.CreateSession)
+			sessions.GET("/verify/:code", h.Session.VerifyCode)
 			sessions.GET("/:id", h.Session.GetSession)
 			sessions.PUT("/:id/status", h.Session.UpdateStatus)
 			sessions.POST("/:id/extend", h.Session.ExtendExpiry)
+			sessions.GET("/:id/links", h.Session.GetAccessLinks)
 			sessions.POST("/:id/links", h.Session.CreateAccessLink)
 
 			// Nested People under Session
