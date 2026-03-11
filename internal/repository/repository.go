@@ -16,8 +16,8 @@ type Repositories struct {
 // NewRepositories initializes and returns a merged Repositories structure linking to SQLite.
 func NewRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
-		Session: NewSessionRepository(db),
-		Person:  NewPersonRepository(db),
-		// We'll populate Relationship repo in MOR-15.
+		Session:      NewSessionRepository(db),
+		Person:       NewPersonRepository(db),
+		Relationship: NewRelationshipRepository(db),
 	}
 }

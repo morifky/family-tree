@@ -16,8 +16,8 @@ type Services struct {
 // NewServices initializes the service layer merging business logic handlers globally.
 func NewServices(repos *repository.Repositories, photoStorage storage.PhotoStorage) *Services {
 	return &Services{
-		Session: NewSessionService(repos.Session),
-		Person:  NewPersonService(repos.Person, photoStorage),
-		// We'll populate Relationship service in MOR-15
+		Session:      NewSessionService(repos.Session),
+		Person:       NewPersonService(repos.Person, photoStorage),
+		Relationship: NewRelationshipService(repos.Relationship),
 	}
 }
