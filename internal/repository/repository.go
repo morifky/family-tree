@@ -17,6 +17,7 @@ type Repositories struct {
 func NewRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
 		Session: NewSessionRepository(db),
-		// We'll populate Person and Relationship repos in MOR-14 and MOR-15.
+		Person:  NewPersonRepository(db),
+		// We'll populate Relationship repo in MOR-15.
 	}
 }
