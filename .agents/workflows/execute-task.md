@@ -11,13 +11,14 @@ When working on a Linear issue (e.g., MOR-9), follow this workflow to automate b
 - For the given Linear task, get its `gitBranchName` using the Linear MCP tool or create one manually following the convention `MOR-<ID>-<short-description>`.
 - Use the `run_command` tool to create and checkout the new branch:
   ```bash
-  git checkout -b <branch_name>
+  git checkout -b MOR-<ID>-<short-description>
   ```
 
 ## 2. Generate Code iteratively
 
 - Implement the requested feature or bug fix.
 - Make sure to review the technical specification and project rules before making changes to ensure everything stays compliant.
+- Checkpoint to ensure critical path are covered by unit test as stated on the rules
 
 ## 3. Verify the Code (Run Tests / Linters)
 
