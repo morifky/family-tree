@@ -43,5 +43,13 @@ func (r *personRepository) UpdatePerson(ctx context.Context, person *model.Perso
 }
 
 func (r *personRepository) DeletePerson(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&model.Person{}).Error
+	var person model.Person
+	if err := r.db.WithContext(ctx).First(&person, "id = ?", id).Error; err != nil {
+		// Ignore if not found
+		if err == gorm.ErrRecordNotFound {
+			return nil
+		}
+		return err
+	}
+	return r.db.WithContext(ctx).Delete(&person).Error
 }

@@ -173,7 +173,7 @@ func TestSessionService_VerifyAccessCode(t *testing.T) {
 		sessionID, accessType, err := svc.VerifyAccessCode(ctx, "adm1")
 		assert.NoError(t, err)
 		assert.Equal(t, "sess1", sessionID)
-		assert.Equal(t, model.AccessTypeEdit, accessType)
+		assert.Equal(t, model.AccessTypeAdmin, accessType)
 
 		mockRepo.AssertExpectations(t)
 	})

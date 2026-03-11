@@ -12,6 +12,7 @@ type Handlers struct {
 	Session      *SessionHandler
 	Person       *PersonHandler
 	Relationship *RelationshipHandler
+	Tree         *TreeHandler
 }
 
 // NewHandlers links all the handlers to their underlying services.
@@ -20,6 +21,7 @@ func NewHandlers(services *service.Services, photoStorage storage.PhotoStorage) 
 		Session:      NewSessionHandler(services.Session),
 		Person:       NewPersonHandler(services.Person, photoStorage),
 		Relationship: NewRelationshipHandler(services.Relationship),
+		Tree:         NewTreeHandler(services.Session, services.Person, services.Relationship),
 	}
 }
 
@@ -43,6 +45,9 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 			// Nested Relationships under Session
 			sessions.POST("/:id/relationships", h.Relationship.CreateRelationship)
 			sessions.GET("/:id/relationships", h.Relationship.GetRelationships)
+
+			// Aggregate Polling Endpoints
+			sessions.GET("/:id/tree", h.Tree.GetTree)
 		}
 
 		// People
