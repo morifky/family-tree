@@ -4,18 +4,21 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"brayat/internal/service"
+	"brayat/internal/storage"
 )
 
 // Handlers bundles all route handlers.
 type Handlers struct {
 	Session *SessionHandler
-	// Add Person and Relationship handlers here down the line
+	Person  *PersonHandler
+	// Add Relationship handlers here down the line
 }
 
 // NewHandlers links all the handlers to their underlying services.
-func NewHandlers(services *service.Services) *Handlers {
+func NewHandlers(services *service.Services, photoStorage *storage.PhotoStorage) *Handlers {
 	return &Handlers{
 		Session: NewSessionHandler(services.Session),
+		Person:  NewPersonHandler(services.Person, photoStorage),
 	}
 }
 
@@ -31,6 +34,17 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 			sessions.PUT("/:id/status", h.Session.UpdateStatus)
 			sessions.POST("/:id/extend", h.Session.ExtendExpiry)
 			sessions.POST("/:id/links", h.Session.CreateAccessLink)
+
+			// Nested People under Session
+			sessions.POST("/:id/people", h.Person.CreatePerson)
+			sessions.GET("/:id/people", h.Person.GetPeople)
+		}
+
+		// People
+		people := api.Group("/people")
+		{
+			people.PUT("/:id", h.Person.UpdatePerson)
+			people.DELETE("/:id", h.Person.DeletePerson)
 		}
 	}
 }

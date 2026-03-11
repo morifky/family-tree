@@ -3,6 +3,7 @@ package service
 import (
 	"brayat/internal/model"
 	"brayat/internal/repository"
+	"brayat/internal/storage"
 )
 
 // Services contains all the service interfaces handling business logic.
@@ -13,9 +14,10 @@ type Services struct {
 }
 
 // NewServices initializes the service layer merging business logic handlers globally.
-func NewServices(repos *repository.Repositories) *Services {
+func NewServices(repos *repository.Repositories, photoStorage *storage.PhotoStorage) *Services {
 	return &Services{
 		Session: NewSessionService(repos.Session),
-		// We'll populate Person and Relationship services in MOR-14 and MOR-15
+		Person:  NewPersonService(repos.Person, photoStorage),
+		// We'll populate Relationship service in MOR-15
 	}
 }
