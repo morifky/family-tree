@@ -132,6 +132,36 @@ func TestPersonHandler_CreatePerson(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
+
+	t.Run("Missing Gender", func(t *testing.T) {
+		sessionID := "sess123"
+		
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		_ = writer.WriteField("name", "John")
+		writer.Close()
+
+		req, _ := http.NewRequest(http.MethodPost, "/sessions/"+sessionID+"/people", body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Invalid Multipart", func(t *testing.T) {
+		sessionID := "sess123"
+		
+		req, _ := http.NewRequest(http.MethodPost, "/sessions/"+sessionID+"/people", bytes.NewReader([]byte("plain text")))
+		// Set header to multipart but body is not correctly formatted multipart
+		req.Header.Set("Content-Type", "multipart/form-data; boundary=myboundary")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
 	
 	t.Run("Service Error", func(t *testing.T) {
 		sessionID := "sessErr"
@@ -222,6 +252,52 @@ func TestPersonHandler_UpdatePerson(t *testing.T) {
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 		mockSvc.AssertExpectations(t)
+	})
+
+	t.Run("Missing Name", func(t *testing.T) {
+		pID := "p123"
+		
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		_ = writer.WriteField("gender", "female")
+		writer.Close()
+
+		req, _ := http.NewRequest(http.MethodPut, "/people/"+pID, body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Missing Gender", func(t *testing.T) {
+		pID := "p123"
+		
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		_ = writer.WriteField("name", "Jane")
+		writer.Close()
+
+		req, _ := http.NewRequest(http.MethodPut, "/people/"+pID, body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Invalid Multipart", func(t *testing.T) {
+		pID := "p123"
+		
+		req, _ := http.NewRequest(http.MethodPut, "/people/"+pID, bytes.NewReader([]byte("plain text")))
+		req.Header.Set("Content-Type", "multipart/form-data; boundary=myboundary")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 }
 

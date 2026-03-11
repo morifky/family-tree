@@ -116,4 +116,8 @@ func TestPersonRepository_DeletePerson(t *testing.T) {
 	var count int64
 	db.Model(&model.Person{}).Where("id = ?", "delP").Count(&count)
 	assert.Equal(t, int64(0), count)
+
+	// Test deleting non-existent person
+	err = repo.DeletePerson(ctx, "nonexistent")
+	assert.NoError(t, err) // Should return nil if not found
 }
