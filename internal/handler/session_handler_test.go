@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 
 	"brayat/internal/handler"
 	"brayat/internal/model"
@@ -81,7 +82,7 @@ func setupSessionRouter(svc *MockSessionService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 	
-	h := handler.NewSessionHandler(svc)
+	h := handler.NewSessionHandler(svc, zap.NewNop())
 	
 	router.POST("/sessions", h.CreateSession)
 	router.GET("/sessions/:id", h.GetSession)

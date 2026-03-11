@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"brayat/internal/model"
 )
@@ -11,11 +12,12 @@ import (
 // RelationshipHandler handles HTTP requests for Relationship resources
 type RelationshipHandler struct {
 	service model.RelationshipService
+	logger  *zap.Logger
 }
 
 // NewRelationshipHandler creates a new handler serving relationship requests
-func NewRelationshipHandler(svc model.RelationshipService) *RelationshipHandler {
-	return &RelationshipHandler{service: svc}
+func NewRelationshipHandler(svc model.RelationshipService, logger *zap.Logger) *RelationshipHandler {
+	return &RelationshipHandler{service: svc, logger: logger}
 }
 
 // POST /sessions/:id/relationships

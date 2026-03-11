@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"brayat/internal/service"
 	"brayat/internal/storage"
@@ -13,15 +14,17 @@ type Handlers struct {
 	Person       *PersonHandler
 	Relationship *RelationshipHandler
 	Tree         *TreeHandler
+	logger       *zap.Logger
 }
 
 // NewHandlers links all the handlers to their underlying services.
-func NewHandlers(services *service.Services, photoStorage storage.PhotoStorage) *Handlers {
+func NewHandlers(services *service.Services, photoStorage storage.PhotoStorage, logger *zap.Logger) *Handlers {
 	return &Handlers{
-		Session:      NewSessionHandler(services.Session),
-		Person:       NewPersonHandler(services.Person, photoStorage),
-		Relationship: NewRelationshipHandler(services.Relationship),
-		Tree:         NewTreeHandler(services.Session, services.Person, services.Relationship),
+		Session:      NewSessionHandler(services.Session, logger),
+		Person:       NewPersonHandler(services.Person, photoStorage, logger),
+		Relationship: NewRelationshipHandler(services.Relationship, logger),
+		Tree:         NewTreeHandler(services.Session, services.Person, services.Relationship, logger),
+		logger:       logger,
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"brayat/internal/model"
 )
@@ -11,11 +12,12 @@ import (
 // SessionHandler handles HTTP requests for Session resources
 type SessionHandler struct {
 	service model.SessionService
+	logger  *zap.Logger
 }
 
 // NewSessionHandler creates a new handler serving session requests
-func NewSessionHandler(svc model.SessionService) *SessionHandler {
-	return &SessionHandler{service: svc}
+func NewSessionHandler(svc model.SessionService, logger *zap.Logger) *SessionHandler {
+	return &SessionHandler{service: svc, logger: logger}
 }
 
 // POST /sessions
