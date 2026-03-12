@@ -1,4 +1,4 @@
-module brayat
+module family-tree
 
 go 1.26.1
 
