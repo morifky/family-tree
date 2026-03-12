@@ -2,14 +2,20 @@ import { browser } from '$app/environment';
 
 const API_BASE = '/api/v1';
 
-async function request(path: string, options: RequestInit = {}) {
+async function request(path: string, options: RequestInit = {}, returnRaw = false) {
+    const isFormData = options.body instanceof FormData;
+    
+    const headers: Record<string, string> = { ...(options.headers as any) };
+    if (!isFormData && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
+
     const res = await fetch(`${API_BASE}${path}`, {
         ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(options.headers || {})
-        }
+        headers
     });
+
+    if (returnRaw) return res;
 
     if (!res.ok) {
         const error = await res.json().catch(() => ({ message: 'Terjadi kesalahan sistem' }));
@@ -43,16 +49,18 @@ export const api = {
         }),
         // Verify code (admin, edit, or view)
         verifyCode: (code: string) => request(`/sessions/verify/${code}`),
-        getTree: (id: string) => request(`/sessions/${id}/tree`)
+        getTree: (id: string, etag?: string) => request(`/sessions/${id}/tree`, {
+            headers: etag ? { 'If-None-Match': etag } : {}
+        }, true) // Return raw to check for 304
     },
     people: {
-        create: (sessionId: string, data: any) => request(`/sessions/${sessionId}/people`, {
+        create: (sessionId: string, data: FormData) => request(`/sessions/${sessionId}/people`, {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: data
         }),
-        update: (id: string, data: any) => request(`/people/${id}`, {
+        update: (id: string, data: FormData) => request(`/people/${id}`, {
             method: 'PUT',
-            body: JSON.stringify(data)
+            body: data
         }),
         delete: (id: string) => request(`/people/${id}`, {
             method: 'DELETE'
