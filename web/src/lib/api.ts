@@ -42,6 +42,29 @@ export const api = {
             body: JSON.stringify({ type })
         }),
         // Verify code (admin, edit, or view)
-        verifyCode: (code: string) => request(`/sessions/verify/${code}`)
+        verifyCode: (code: string) => request(`/sessions/verify/${code}`),
+        getTree: (id: string) => request(`/sessions/${id}/tree`)
+    },
+    people: {
+        create: (sessionId: string, data: any) => request(`/sessions/${sessionId}/people`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }),
+        update: (id: string, data: any) => request(`/people/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        }),
+        delete: (id: string) => request(`/people/${id}`, {
+            method: 'DELETE'
+        })
+    },
+    relationships: {
+        create: (sessionId: string, data: any) => request(`/sessions/${sessionId}/relationships`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }),
+        delete: (id: string) => request(`/relationships/${id}`, {
+            method: 'DELETE'
+        })
     }
 };
