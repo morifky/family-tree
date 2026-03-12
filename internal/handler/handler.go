@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
@@ -68,4 +71,24 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 			relationships.DELETE("/:id", h.Relationship.DeleteRelationship)
 		}
 	}
+
+	// Serve Photos from /data/photos
+	// In production, cfg.PhotosDir defaults to /data/photos
+	router.Static("/photos", "/data/photos")
+
+	// Serve Frontend (SvelteKit static build)
+	// We serve the build directory and fallback to index.html for SPA routing
+	router.Static("/_app", "./web/build/_app")
+	router.StaticFile("/favicon.png", "./web/build/favicon.png")
+	router.StaticFile("/robots.txt", "./web/build/robots.txt")
+
+	router.NoRoute(func(c *gin.Context) {
+		// If requesting something that looks like an asset but wasn't found, 404
+		if strings.Contains(c.Request.URL.Path, ".") {
+			c.Status(http.StatusNotFound)
+			return
+		}
+		// Otherwise serve index.html for SPA routing
+		c.File("./web/build/index.html")
+	})
 }

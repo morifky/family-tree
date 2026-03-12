@@ -27,5 +27,23 @@ go mod download
 make test
 
 # 3. Start development server
-make dev
 ```
+
+## Deployment
+
+The application is designed to be deployed as a single Docker container.
+
+### Deploy to Fly.io
+
+1. **Install Fly CTL**: Follow the instructions at [fly.io/docs/hands-on/install-flyctl/](https://fly.io/docs/hands-on/install-flyctl/).
+2. **Login**: `fly auth login`.
+3. **Create Volume**: The app requires a volume for persistent storage (SQLite & Photos):
+   ```bash
+   fly volumes create brayat_data --size 1
+   ```
+4. **Deploy**:
+   ```bash
+   fly deploy
+   ```
+
+The `Dockerfile` handles the multi-stage build (SvelteKit → Go), and the Go server serves both the API and the static frontend assets.

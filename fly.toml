@@ -1,0 +1,31 @@
+# fly.toml app configuration file generated for brayat on 2026-03-12
+
+app = "brayat"
+primary_region = "hkg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+
+[[mounts]]
+  source = "brayat_data"
+  destination = "/data"
+
+[env]
+  PORT = "8080"
+  DATABASE_PATH = "/data/brayat.db"
+  PHOTOS_DIR = "/data/photos"
+  LOG_LEVEL = "info"
+  GIN_MODE = "release"
