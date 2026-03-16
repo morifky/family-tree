@@ -3,15 +3,15 @@
 
     let { person, accessType, onEdit, onDelete, onAddFamily } = $props();
 
-    const isMale = $derived(person.Gender === 'male');
+    const isMale = $derived(person.gender === 'male');
     const accentColor = $derived(isMale ? 'var(--color-primary)' : 'var(--color-secondary)');
     const bgAccent = $derived(isMale ? '#eff6ff' : '#fdf2f8');
 </script>
 
 <div class="person-card" style="--accent: {accentColor}; --bg-accent: {bgAccent}">
     <div class="avatar-container">
-        {#if person.PhotoPath}
-            <img src={person.PhotoPath} alt={person.Name} class="avatar" />
+        {#if person.photo_path}
+            <img src="/photos/{person.photo_path}" alt={person.name} class="avatar" />
         {:else}
             <div class="avatar-placeholder">
                 <User size={32} />
@@ -20,9 +20,9 @@
     </div>
 
     <div class="info">
-        <h3 class="name">{person.Name}</h3>
-        {#if person.Nickname}
-            <p class="nickname">"{person.Nickname}"</p>
+        <h3 class="name">{person.name}</h3>
+        {#if person.nickname}
+            <p class="nickname">"{person.nickname}"</p>
         {/if}
     </div>
 

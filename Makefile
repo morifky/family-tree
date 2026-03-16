@@ -1,13 +1,31 @@
-.PHONY: dev build test migrate
+.PHONY: build run stop logs clean
 
-dev:
-	go run cmd/server/main.go
+IMAGE_NAME ?= brayat-app
+CONTAINER_NAME ?= brayat-container
+PORT ?= 8080
 
+# Build the docker image
 build:
-	go build -o tmp/bin/brayat cmd/server/main.go
+	docker build -t $(IMAGE_NAME) .
 
-test:
-	go test -v ./... -cover
+# Run the docker container in detached mode
+run: stop
+	docker run -d \
+		--name $(CONTAINER_NAME) \
+		-p $(PORT):8080 \
+		-v brayat_data:/data \
+		$(IMAGE_NAME)
 
-migrate:
-	@echo "Migrations are handled by GORM AutoMigrate on startup."
+# Stop and remove the container
+stop:
+	docker stop $(CONTAINER_NAME) 2>/dev/null || true
+	docker rm $(CONTAINER_NAME) 2>/dev/null || true
+
+# View container logs
+logs:
+	docker logs -f $(CONTAINER_NAME)
+
+# Clean up container, image, and volume
+clean: stop
+	docker rmi $(IMAGE_NAME) 2>/dev/null || true
+	docker volume rm brayat_data 2>/dev/null || true

@@ -28,24 +28,24 @@ const (
 
 // Session represents a family tree session
 type Session struct {
-	ID        string        `gorm:"type:varchar(10);primaryKey"`
-	Title     string        `gorm:"type:varchar(100);not null"`
-	AdminCode string        `gorm:"type:varchar(10);uniqueIndex;not null"`
-	Status    SessionStatus `gorm:"type:varchar(20);default:'active'"`
-	ExpiresAt time.Time     `gorm:"not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string        `gorm:"type:varchar(10);primaryKey" json:"id"`
+	Title     string        `gorm:"type:varchar(100);not null" json:"title"`
+	AdminCode string        `gorm:"type:varchar(10);uniqueIndex;not null" json:"admin_code"`
+	Status    SessionStatus `gorm:"type:varchar(20);default:'active'" json:"status"`
+	ExpiresAt time.Time     `gorm:"not null" json:"expires_at"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
 }
 
 // AccessLink represents a shareable link that grants either view or edit access
 type AccessLink struct {
-	ID        string     `gorm:"type:varchar(10);primaryKey"`
-	SessionID string     `gorm:"type:varchar(10);not null"`
-	Session   Session    `gorm:"foreignKey:SessionID;constraint:OnDelete:CASCADE;"`
-	Code      string     `gorm:"type:varchar(10);uniqueIndex;not null"`
-	Type      AccessType `gorm:"type:varchar(20);not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string     `gorm:"type:varchar(10);primaryKey" json:"id"`
+	SessionID string     `gorm:"type:varchar(10);not null" json:"session_id"`
+	Session   Session    `gorm:"foreignKey:SessionID;constraint:OnDelete:CASCADE;" json:"-"`
+	Code      string     `gorm:"type:varchar(10);uniqueIndex;not null" json:"code"`
+	Type      AccessType `gorm:"type:varchar(20);not null" json:"type"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 }
 
 // BeforeCreate hooks to auto-generate 10-character IDs

@@ -19,15 +19,15 @@ const (
 
 // Person represents an individual in the family tree
 type Person struct {
-	ID        string  `gorm:"type:varchar(10);primaryKey"`
-	SessionID string  `gorm:"type:varchar(10);not null"`
-	Session   Session `gorm:"foreignKey:SessionID;constraint:OnDelete:CASCADE;"`
-	Name      string  `gorm:"type:varchar(100);not null"`
-	Nickname  *string `gorm:"type:varchar(50)"`
-	Gender    Gender  `gorm:"type:varchar(10);not null"`
-	PhotoPath *string `gorm:"type:varchar(255)"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string    `gorm:"type:varchar(10);primaryKey" json:"id"`
+	SessionID string    `gorm:"type:varchar(10);not null" json:"session_id"`
+	Session   Session   `gorm:"foreignKey:SessionID;constraint:OnDelete:CASCADE;" json:"-"`
+	Name      string    `gorm:"type:varchar(100);not null" json:"name"`
+	Nickname  *string   `gorm:"type:varchar(50)" json:"nickname"`
+	Gender    Gender    `gorm:"type:varchar(10);not null" json:"gender"`
+	PhotoPath *string   `gorm:"type:varchar(255)" json:"photo_path"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // BeforeCreate hook to auto-generate 10-character IDs
@@ -40,12 +40,12 @@ func (p *Person) BeforeCreate(tx *gorm.DB) (err error) {
 
 // AfterSave touches the parent Session to update its UpdatedAt field
 func (p *Person) AfterSave(tx *gorm.DB) (err error) {
-	return tx.Model(&Session{ID: p.SessionID}).Update("updated_at", time.Now()).Error
+	return tx.Table("sessions").Where("id = ?", p.SessionID).Update("updated_at", time.Now()).Error
 }
 
 // AfterDelete touches the parent Session to update its UpdatedAt field
 func (p *Person) AfterDelete(tx *gorm.DB) (err error) {
-	return tx.Model(&Session{ID: p.SessionID}).Update("updated_at", time.Now()).Error
+	return tx.Table("sessions").Where("id = ?", p.SessionID).Update("updated_at", time.Now()).Error
 }
 
 // PersonRepository defines the expected behavior of a person data access layer

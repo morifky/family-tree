@@ -52,6 +52,18 @@ func (h *SessionHandler) GetSession(c *gin.Context) {
 	SuccessResponse(c, session)
 }
 
+// GET /sessions/admin/:code
+func (h *SessionHandler) GetSessionByAdminCode(c *gin.Context) {
+	code := c.Param("code")
+	session, err := h.service.GetSessionByAdminCode(c.Request.Context(), code)
+	if err != nil {
+		ErrorResponse(c, http.StatusNotFound, "Session not found")
+		return
+	}
+
+	SuccessResponse(c, session)
+}
+
 // PUT /sessions/:id/status
 func (h *SessionHandler) UpdateStatus(c *gin.Context) {
 	id := c.Param("id")

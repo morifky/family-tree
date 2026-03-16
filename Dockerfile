@@ -9,7 +9,7 @@ COPY web/ ./web/
 RUN cd web && npm run build
 
 # Stage 2: Build Go Backend
-FROM golang:1.23-alpine AS backend-builder
+FROM golang:1.26-alpine AS backend-builder
 # Install build tools for CGO (required by sqlite driver)
 RUN apk add --no-cache gcc musl-dev
 WORKDIR /app

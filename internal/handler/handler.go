@@ -40,6 +40,7 @@ func (h *Handlers) RegisterRoutes(router *gin.Engine) {
 		{
 			sessions.POST("", h.Session.CreateSession)
 			sessions.GET("/verify/:code", h.Session.VerifyCode)
+			sessions.GET("/admin/:code", h.Session.GetSessionByAdminCode)
 			sessions.GET("/:id", h.Session.GetSession)
 			sessions.PUT("/:id/status", h.Session.UpdateStatus)
 			sessions.POST("/:id/extend", h.Session.ExtendExpiry)

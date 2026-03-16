@@ -23,10 +23,10 @@
 
     // Sync state when person changes (e.g. modal re-opened with different person)
     $effect(() => {
-        name = person?.Name || '';
-        nickname = person?.Nickname || '';
-        gender = person?.Gender || 'male';
-        photoPreview = person?.PhotoPath || '';
+        name = person?.name || '';
+        nickname = person?.nickname || '';
+        gender = person?.gender || 'male';
+        photoPreview = person?.photo_path || '';
         photo = null;
     });
 
@@ -76,8 +76,8 @@
                 const newPerson = await api.people.create(sessionId, formData);
                 onSuccess(newPerson);
             } else {
-                await api.people.update(person.ID, formData);
-                onSuccess({ ...person, Name: name, Nickname: nickname, Gender: gender, PhotoPath: photoPreview });
+                await api.people.update(person.id, formData);
+                onSuccess({ ...person, name: name, nickname: nickname, gender: gender, photo_path: photoPreview });
             }
         } catch (err: any) {
             error = err.message;

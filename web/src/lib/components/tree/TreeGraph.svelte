@@ -41,12 +41,12 @@
         // 1. Identify parents and children from relationships
         const childrenIds = new Set(
             relationships
-                .filter(rel => rel.Type === 'parent_child')
-                .map(rel => rel.PersonBID)
+                .filter(rel => rel.type === 'parent_child')
+                .map(rel => rel.person_b_id)
         );
 
         // 2. Find root nodes (people who are not children in any parent_child relationship)
-        const roots = people.filter(p => !childrenIds.has(p.ID));
+        const roots = people.filter(p => !childrenIds.has(p.id));
 
         // 3. Create hierarchy
         // Note: Silsilah can be complex (multiple roots, multiple parents), 
@@ -72,10 +72,10 @@
         const item: any = { ...person };
         
         // Find children
-        const childRels = allRels.filter(rel => rel.Type === 'parent_child' && rel.PersonAID === person.ID);
+        const childRels = allRels.filter(rel => rel.type === 'parent_child' && rel.person_a_id === person.id);
         if (childRels.length > 0) {
             item.children = childRels.map(rel => {
-                const child = allPeople.find(p => p.ID === rel.PersonBID);
+                const child = allPeople.find(p => p.id === rel.person_b_id);
                 return child ? buildSubtree(child, allPeople, allRels) : null;
             }).filter(Boolean);
         }

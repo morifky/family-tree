@@ -23,7 +23,9 @@ async function request(path: string, options: RequestInit = {}, returnRaw = fals
     }
 
     if (res.status === 204) return null;
-    return res.json();
+    
+    const result = await res.json();
+    return result.data !== undefined ? result.data : result;
 }
 
 export const api = {
@@ -33,6 +35,7 @@ export const api = {
             body: JSON.stringify({ title }) 
         }),
         get: (id: string) => request(`/sessions/${id}`),
+        getByAdminCode: (code: string) => request(`/sessions/admin/${code}`),
         updateStatus: (id: string, status: string) => request(`/sessions/${id}/status`, {
             method: 'PUT',
             body: JSON.stringify({ status })

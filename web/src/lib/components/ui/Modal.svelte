@@ -84,7 +84,7 @@
     }
 
     .modal-header {
-        padding: var(--space-lg);
+        padding: var(--space-md) var(--space-lg);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -96,15 +96,16 @@
     }
 
     .modal-header h2 {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         color: var(--color-primary);
     }
 
     .close-btn {
         background: var(--bg-main);
         border: none;
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
         border-radius: var(--radius-full);
         display: flex;
         align-items: center;
@@ -120,6 +121,11 @@
     }
 
     .modal-body {
-        padding: var(--space-lg);
+        padding: var(--space-md) var(--space-lg);
+    }
+
+    @media (max-width: 400px) {
+        .modal-header { padding: var(--space-sm) var(--space-md); }
+        .modal-body   { padding: var(--space-sm) var(--space-md); }
     }
 </style>
