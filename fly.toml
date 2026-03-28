@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for brayat on 2026-03-28T11:45:36Z
+# fly.toml app configuration file generated for brayat on 2026-03-28T11:52:04Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
 app = 'brayat'
-primary_region = 'ams'
+primary_region = 'iad'
 
 [build]
 
@@ -20,15 +20,4 @@ primary_region = 'ams'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-  memory_mb = 256
-
-[[mounts]]
-  source = "brayat_data"
-  destination = "/data"
-
-[env]
-  PORT = "8080"
-  DATABASE_PATH = "/data/brayat.db"
-  PHOTOS_DIR = "/data/photos"
-  LOG_LEVEL = "info"
-  GIN_MODE = "release"
+  memory_mb = 1024
