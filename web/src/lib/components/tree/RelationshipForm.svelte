@@ -2,7 +2,7 @@
     import { api } from '$lib/api';
     import { Link2, User } from 'lucide-svelte';
 
-    let { sessionId, people = [], preselectedPerson = null, onSuccess } = $props();
+    let { sessionId, people = [], relationships = [], preselectedPerson = null, onSuccess } = $props();
 
     let personAId = $state('');
     let personBId = $state('');
@@ -25,6 +25,62 @@
         if (!personAId || !personBId || personAId === personBId) {
             error = 'Pilih dua orang yang berbeda.';
             return;
+        }
+
+        // Check for exact duplicates
+        const existing = relationships.find((r: any) => {
+            if (r.type === 'spouse' && relType === 'spouse') {
+                return (r.person_a_id === personAId && r.person_b_id === personBId) ||
+                       (r.person_a_id === personBId && r.person_b_id === personAId);
+            }
+            if (r.type === 'parent_child' && relType === 'parent_child') {
+                return (r.person_a_id === personAId && r.person_b_id === personBId);
+            }
+            return false;
+        });
+
+        if (existing) {
+            error = 'Hubungan ini sudah ada.';
+            return;
+        }
+
+        // Block conflicting relationship types between same pair
+        // (a pair can't be both spouse AND parent-child)
+        const conflictingType = relType === 'spouse' ? 'parent_child' : 'spouse';
+        const hasConflict = relationships.some((r: any) => {
+            if (r.type !== conflictingType) return false;
+            // For spouse: bidirectional check
+            if (relType === 'spouse') {
+                return (r.person_a_id === personAId && r.person_b_id === personBId) ||
+                       (r.person_a_id === personBId && r.person_b_id === personAId);
+            }
+            // For parent_child: bidirectional check (A→B or B→A)
+            return (r.person_a_id === personAId && r.person_b_id === personBId) ||
+                   (r.person_a_id === personBId && r.person_b_id === personAId);
+        });
+
+        if (hasConflict) {
+            if (relType === 'spouse') {
+                error = 'Pasangan tidak valid: kedua orang ini sudah memiliki hubungan Orang Tua-Anak.';
+            } else {
+                error = 'Tidak valid: kedua orang ini sudah berpasangan (suami-istri), tidak bisa sekaligus menjadi Orang Tua-Anak.';
+            }
+            return;
+        }
+
+        // Prevent adding redundant inherited relations
+        if (relType === 'parent_child') {
+            const hasSpouseParent = relationships.some((r: any) => {
+                if (r.type !== 'spouse') return false;
+                const spouseId = r.person_a_id === personAId ? r.person_b_id : (r.person_b_id === personAId ? r.person_a_id : null);
+                if (!spouseId) return false;
+                return relationships.some((r2: any) => r2.type === 'parent_child' && r2.person_a_id === spouseId && r2.person_b_id === personBId);
+            });
+
+            if (hasSpouseParent) {
+                error = 'Hubungan ini sudah terwarisi otomatis karena pasangan adalah orang tua dari anak ini.';
+                return;
+            }
         }
 
         loading = true;

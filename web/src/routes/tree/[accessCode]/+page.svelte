@@ -5,6 +5,7 @@
     import CanvasPanZoom from '$lib/components/tree/CanvasPanZoom.svelte';
     import TreeGraph from '$lib/components/tree/TreeGraph.svelte';
     import Modal from '$lib/components/ui/Modal.svelte';
+    import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
     import PersonForm from '$lib/components/tree/PersonForm.svelte';
     import RelationshipForm from '$lib/components/tree/RelationshipForm.svelte';
     import { Settings, Share2, Plus, Home, RefreshCw, Link2, Trash2, Check } from 'lucide-svelte';
@@ -32,6 +33,19 @@
 
     // Relationships panel
     let showRelPanel = $state(false);
+
+    // Confirm dialog state
+    let confirmShow   = $state(false);
+    let confirmTitle  = $state('');
+    let confirmMsg    = $state('');
+    let confirmAction = $state<() => void>(() => {});
+
+    function openConfirm(title: string, msg: string, action: () => void) {
+        confirmTitle  = title;
+        confirmMsg    = msg;
+        confirmAction = action;
+        confirmShow   = true;
+    }
 
     async function loadTree(isPolling = false, force = false) {
         if (!isPolling) loading = true;
@@ -76,7 +90,6 @@
             copied = true;
             setTimeout(() => copied = false, 2000);
         } catch {
-            // Fallback
             prompt('Salin link ini:', window.location.href);
         }
     }
@@ -88,16 +101,21 @@
         showPersonForm = true;
     }
 
-    async function handleDelete(person: any) {
-        if (!confirm(`Hapus "${person.name}"? Seluruh data hubungan orang ini juga akan hilang.`)) return;
-        try {
-            await api.people.delete(person.id);
-            people = people.filter(p => p.id !== person.id);
-            relationships = relationships.filter(r => r.person_a_id !== person.id && r.person_b_id !== person.id);
-            loadTree(true, true);
-        } catch (err: any) {
-            alert('Gagal menghapus: ' + err.message);
-        }
+    function handleDelete(person: any) {
+        openConfirm(
+            'Hapus Anggota',
+            `Hapus "${person.name}"?\nSeluruh data hubungan orang ini juga akan ikut terhapus.`,
+            async () => {
+                try {
+                    await api.people.delete(person.id);
+                    people = people.filter(p => p.id !== person.id);
+                    relationships = relationships.filter(r => r.person_a_id !== person.id && r.person_b_id !== person.id);
+                    loadTree(true, true);
+                } catch (err: any) {
+                    openConfirm('Gagal', 'Gagal menghapus: ' + err.message, () => {});
+                }
+            }
+        );
     }
 
     function handleAddFamily(person: any) {
@@ -122,21 +140,26 @@
         loadTree(true, true);
     }
 
-    async function handleDeleteRelationship(rel: any) {
+    function handleDeleteRelationship(rel: any) {
         const personA = people.find(p => p.id === rel.person_a_id);
         const personB = people.find(p => p.id === rel.person_b_id);
-        const label = rel.type === 'parent_child'
-            ? `${personA?.name || '?'} → ${personB?.name || '?'} (Orang Tua-Anak)`
-            : `${personA?.name || '?'} ↔ ${personB?.name || '?'} (Pasangan)`;
+        const typeLabel = rel.type === 'parent_child' ? 'Orang Tua-Anak' : 'Pasangan';
+        const arrow    = rel.type === 'parent_child' ? '→' : '↔';
+        const label    = `${personA?.name || '?'} ${arrow} ${personB?.name || '?'}`;
 
-        if (!confirm(`Hapus hubungan:\n${label}?`)) return;
-        try {
-            await api.relationships.delete(rel.id);
-            relationships = relationships.filter(r => r.id !== rel.id);
-            loadTree(true, true);
-        } catch (err: any) {
-            alert('Gagal menghapus hubungan: ' + err.message);
-        }
+        openConfirm(
+            'Hapus Hubungan',
+            `Hapus hubungan ${typeLabel}:\n${label}?`,
+            async () => {
+                try {
+                    await api.relationships.delete(rel.id);
+                    relationships = relationships.filter(r => r.id !== rel.id);
+                    loadTree(true, true);
+                } catch (err: any) {
+                    openConfirm('Gagal', 'Gagal menghapus: ' + err.message, () => {});
+                }
+            }
+        );
     }
 
     function getPersonName(id: string) {
@@ -296,12 +319,23 @@
             <RelationshipForm
                 sessionId={session.id}
                 {people}
+                {relationships}
                 preselectedPerson={relPreselectedPerson}
                 onSuccess={onRelFormSuccess}
             />
         </Modal>
     {/if}
 </div>
+
+<!-- Confirm Dialog (outside tree-page so it always renders on top) -->
+<ConfirmDialog
+    bind:show={confirmShow}
+    title={confirmTitle}
+    message={confirmMsg}
+    confirmLabel="Hapus"
+    cancelLabel="Batal"
+    onConfirm={confirmAction}
+/>
 
 <style>
     .tree-page {
@@ -485,16 +519,22 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: var(--space-xs) var(--space-sm);
+        padding: var(--space-sm);
         background: var(--bg-main);
+        border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         gap: var(--space-sm);
+        transition: border-color var(--transition-fast);
+    }
+    
+    .rel-item:hover {
+        border-color: #cbd5e1;
     }
 
     .rel-info {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 4px;
         min-width: 0;
     }
 
@@ -502,7 +542,7 @@
         font-size: 0.6rem;
         font-weight: 700;
         text-transform: uppercase;
-        padding: 1px 5px;
+        padding: 2px 6px;
         border-radius: var(--radius-full);
         width: fit-content;
     }
@@ -510,28 +550,29 @@
     .rel-badge.spouse       { background: #fce7f3; color: #9d174d; }
 
     .rel-names {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        font-weight: 500;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .del-btn {
-        background: none;
-        border: none;
+        background: white;
+        border: 1px solid var(--border-color);
         cursor: pointer;
-        color: var(--text-muted);
+        color: var(--color-error);
         padding: 6px;
         border-radius: var(--radius-sm);
         display: flex;
         flex-shrink: 0;
         transition: all var(--transition-fast);
-        min-width: 30px;
-        min-height: 30px;
+        min-width: 32px;
+        min-height: 32px;
         align-items: center;
         justify-content: center;
     }
-    .del-btn:hover { background: #fee2e2; color: var(--color-error); }
+    .del-btn:hover { background: #fee2e2; border-color: #fca5a5; }
 
     .empty-msg {
         padding: var(--space-md);
