@@ -1,0 +1,51 @@
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency: deploy-group
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      # Ensure volume exists before deployment
+      - name: Create volume if not exists
+        run: |
+          # Check if volume already exists
+          if ! flyctl volumes list --json | jq -e '.[] | select(.Name == "brayat_data")' > /dev/null 2>&1; then
+            echo "Creating volume 'brayat_data' in region ams..."
+            flyctl volumes create brayat_data --region ams --size 1 --yes
+          else
+            echo "Volume 'brayat_data' already exists, skipping creation"
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      # Destroy old machines to ensure clean deployment with volumes
+      - name: Destroy old machines
+        run: |
+          echo "Checking for existing machines..."
+          MACHINES=$(flyctl machines list --json | jq -r '.[].id')
+          if [ -n "$MACHINES" ]; then
+            echo "Destroying old machines to allow clean volume attachment..."
+            for machine in $MACHINES; do
+              echo "Destroying machine: $machine"
+              flyctl machines destroy $machine --force || true
+            done
+          else
+            echo "No existing machines to destroy"
+          fi
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only --ha=false
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
